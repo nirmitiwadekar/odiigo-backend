@@ -1,0 +1,136 @@
+{
+    "additional_services_inclusions": {
+        "inclusion": [
+            "AC Vent Cleaning",
+            "AC Inspection"
+        ],
+        "title": "Additional Services"
+    },
+    "already_notified": false,
+    "amc_text": "Save Extra 15% with Miles Membership",
+    "carousel_images": [
+        "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/ac_services/acs2.jpg",
+        "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/ac_services/acs3.jpg",
+        "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/ac_services/acs4.jpg",
+        "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/ac_services/acs5.jpg"
+    ],
+    "custom_chat_url": "https://support.gomechanic.app/custom-chat?service_id=serviceid",
+    "custom_chat_url_with_login": "https://support.gomechanic.app/custom-chat/phoneno?service_id=serviceid",
+    "desc_details": {
+        "inclusion": [
+            [
+                "AC Vent Cleaning",
+                "AC Inspection"
+            ],
+            [
+                "AC Gas (upto 400 gms)",
+                "Condenser Cleaning",
+                "AC Filter Cleaning"
+            ]
+        ],
+        "interval": "Every 5,000 Kms or 3 Months (Recommended)",
+        "match": "In case of AC Gas Leakage - Cooling Coil / AC Unit Replacement might be required",
+        "time_taken": "Takes 4 hours",
+        "warranty": "500 Kms or 1 Month Warranty"
+    },
+    "desc_snippets": [
+        "Takes 4 Hours",
+        "1 Month Warranty",
+        "Every 3 Months Recommended",
+        "Includes 5 services"
+    ],
+    "desc_tags": [
+        "Every 5,000 Kms",
+        "3 Months",
+        "Ac Gas Topup ( upto 400gms )",
+        "Condenser Cleaning",
+        "AC Filter Cleaning",
+        "AC Vent Cleaning",
+        "AC Inspection"
+    ],
+    "description": "Includes : AC Gas Top-up, Condenser Cleaning, AC Filter Cleaning, AC Vent Cleaning, AC Inspection",
+    "detail_page_miles_strip": {
+        "deeplink": "https://gomechanic.in/?pagename=AMC_FRAGMENT&subpagename=JOINNOW_JOINNOW",
+        "sub_title": "Get this service as low as ₹ 2125",
+        "title": "Upgrade to Miles Membership"
+    },
+    "discount_percent": 25,
+    "discount_text": "25% OFF",
+    "essential_services_inclusions": {
+        "inclusions": [
+            {
+                "id": 0,
+                "image": "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/Additional%20Images%20Periodic%20Service/Regular%20AC%20Service/Essential%20Service/AC%20Gas%20Top%20up%20.jpg",
+                "name": "AC Gas\\n(upto 400 gms)"
+            },
+            {
+                "id": 1,
+                "image": "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/Additional%20Images%20Periodic%20Service/Regular%20AC%20Service/Essential%20Service/Condenser%20Cleaning.jpg",
+                "name": "Condenser\\nCleaning"
+            },
+            {
+                "id": 2,
+                "image": "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/Additional%20Images%20Periodic%20Service/Regular%20AC%20Service/Essential%20Service/AC%20Filter%20Cleaning.jpg",
+                "name": "AC Filter\\nCleaning"
+            }
+        ],
+        "title": "Essential Services"
+    },
+    "id": 4109,
+    "image_url": "https://gomechprod.blob.core.windows.net/gm-retail-app/service-new-images/newB.jpg",
+    "imp_note": "For additional repair services, price may vary based on inspection.",
+    "installation_steps": {
+        "steps": [
+            {
+                "step_no": "1",
+                "text": "A Dedicated Service Buddy will arrange a doorstep pick-up from your location."
+            },
+            {
+                "step_no": "2",
+                "text": "Your Car will be serviced at the nearest GoMechanic Workshop."
+            },
+            {
+                "step_no": "3",
+                "text": "Any additional work will be notified and authorised by you."
+            },
+            {
+                "step_no": "4",
+                "text": "We'll doorstep deliver your Car in the specified service time."
+            }
+        ],
+        "title": "Steps After Booking"
+    },
+    "is_amc_enabled": 1,
+    "is_amc_service": false,
+    "name": "Regular AC Service",
+    "notify_button_text": "Notify",
+    "notify_text": "We'll notify of availability",
+    "notify_title": "Out of Stock",
+    "notify_toast": "Notification On",
+    "out_of_stock_sub_text": "Remind Me",
+    "out_of_stock_title": "OUT OF STOCK",
+    "parent_id": 13,
+    "price_details": null,
+    "referral_data": {
+        "amount": 1000,
+        "referral_image": "https://gomechprod.blob.core.windows.net/gm-retail-app/service-new-images/newB.jpg",
+        "title": "I think your Car 🚗 would love this Regular AC Service🛠️\n\n {pUrl}  \n\n Don't forget to use my *Referral Code : TESTDDJ5* 🎁 & *Get a Free Inspection* \n\n {appLink}"
+    },
+    "retail_service_type_id": 13,
+    "sale_amount": 100,
+    "sale_status": false,
+    "sale_text": "Use FREEWIPER get wiper blade",
+    "service_banner_image": "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/Benefits%20Icon%20Categories/AC%20Service%20&%20Repair/Regular%20AC%20Service.png",
+    "service_banner_image_title": "GoMechanic Benefits",
+    "service_chat_url": "https://support.gomechanic.app/chat",
+    "service_chat_url_with_login": "https://support.gomechanic.app/chat/phoneno",
+    "service_slug": "regular-car-ac-service",
+    "service_tag": "FREE AC UNIT INSPECTION",
+    "services_assets": "https://gomechprod.blob.core.windows.net/gomech-retail/gomechanic_assets/ac_services/acs1.jpg",
+    "tax": 18,
+    "type": "Service",
+    "package_details": null,
+    "price": null,
+    "strike_through_price": null,
+    "material_cost": null
+},
