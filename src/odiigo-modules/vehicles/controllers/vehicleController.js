@@ -27,13 +27,23 @@ const getVehicleById = asyncHandler(async (req, res) => {
 // Create new vehicle
 // @route POST /api/vehicles
 
-const createVehicle = asyncHandler(async (req, res) => {
-    const vehicle = new Vehicle(req.body)
-    await vehicle.save()
+// const createVehicle = asyncHandler(async (req, res) => {
+//     const vehicle = new Vehicle(req.body)
+//     await vehicle.save()
 
-    res.status(201).json(vehicle)
-    // res.status(201).json({ message: 'Created vehicle' })
-})
+//     res.status(201).json(vehicle)
+//     // res.status(201).json({ message: 'Created vehicle' })
+// })
+const createVehicle = asyncHandler(async (req, res) => {
+    try {
+        const vehicle = new Vehicle(req.body);
+        await vehicle.save();
+        res.status(201).json(vehicle);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 
 // Update vehicle by ID
 // route PUT /api/vehicles/:id

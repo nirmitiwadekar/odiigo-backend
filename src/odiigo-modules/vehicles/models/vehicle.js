@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const VehicleSchema = new mongoose.Schema(
     {
         request_id: { type: String, default: "" },
-        license_plate: { type: String, required: true, unique: true, default: "" },       // registration_number
+        license_plate: { type: String, default : ""},       // registration_number
         owner_name: { type: String, default: "" },
         father_name: { type: String, default: "" },
         is_financed: { type: String, default: "" },
