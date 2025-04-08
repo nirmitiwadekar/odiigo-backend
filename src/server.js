@@ -18,6 +18,7 @@ const serviceBuddyRoutes = require("./odiigo-modules/service-buddies/routes/serv
 
 const authMiddleware = require("./odiigo-modules/auth/middleware/authMiddleware.js");
 const sessionCheck = require("./odiigo-modules/auth/middleware/sessionCheck.js");
+const cartRoutes = require("./odiigo-modules/cart/routes/cartRoutes.js");
 
 dotenv.config();
 connectDb();
@@ -56,12 +57,13 @@ app.use("/api/userProfile", userRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/pincode", pincodeRoutes);
 app.use("/api/serviceBuddy", serviceBuddyRoutes);
+app.use("/api/cart", cartRoutes);
 
 redisClient
   .connect()
   .then(() => console.log("Redis connected successfully"))
   .catch(console.error);
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running at ${port}`);
 });
