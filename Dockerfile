@@ -1,13 +1,13 @@
-FROM node:22 AS base
-
+FROM mhart/alpine-node AS base
 WORKDIR /usr/src/app
-
-COPY package.json package-lock.json ./
-
+COPY package*.json ./
 RUN npm install
 
+FROM base AS dev
 COPY . .
-
-EXPOSE 3000
-
 CMD ["npm", "run", "dev"]
+
+FROM base AS prod
+COPY . .
+RUN npm prune --production
+CMD ["npm", "run", "start"]
