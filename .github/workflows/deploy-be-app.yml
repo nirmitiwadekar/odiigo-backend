@@ -85,6 +85,8 @@ jobs:
             cd /home/ubuntu/odiigo-be
             git pull origin main
             echo "DOCKER_TARGET=prod" > .env
+            echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env
+            echo "DOCKER_HUB_REPO=odiigo" >> .env
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/odiigo:latest
             docker-compose down
             docker-compose up -d
