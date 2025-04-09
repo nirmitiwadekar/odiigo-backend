@@ -9,7 +9,7 @@ on:
 
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  DOCKER_HUB_REPO: jaymadane/odiigo
+  DOCKER_HUB_REPO: odiigo
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/odiigo
 
 jobs:
