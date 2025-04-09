@@ -84,7 +84,6 @@ const createServicePricing = asyncHandler(async (req, res) => {
     res.status(201).json(newPricing);
 });
 
-
 // @desc    Update service pricing entry
 // @route   PUT /api/service-pricing/:id
 // @access  Private (Admin only)
