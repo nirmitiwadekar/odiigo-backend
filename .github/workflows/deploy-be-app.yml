@@ -86,5 +86,6 @@ jobs:
             git pull origin main
             echo "DOCKER_TARGET=prod" > .env
             docker pull ${{ env.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_HUB_REPO }}:latest
-            docker compose down
-            docker compose up -d
+            docker-compose down
+            docker-compose up -d
+
