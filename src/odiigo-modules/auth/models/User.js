@@ -1,6 +1,14 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    dob: { type: Date, required: true },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other", "Don't want to specify"],
+      default: "Don't want to specify",
+    },
     phone: { type: String, required: true, unique: true },
     name: { type: String,},
     dob: { type: Date,},
