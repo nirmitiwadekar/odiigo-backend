@@ -6,7 +6,65 @@ const Service = require('../../categories/services/models/services')
 // @route   GET /api/service-pricing
 // @access  Public
 const getAllServicePricing = asyncHandler(async (req, res) => {
-    const servicePricing = await ServicePricing.find().populate('service_id');
+    const {
+        q,
+        service_id,
+        car_make,
+        car_model,
+        fuel_type,
+        transmission_type,
+        _sort = "createdAt",
+        _order = "desc",
+        _page = 1,
+        _limit = 10
+    } = req.query;
+
+    let filter = {};
+
+    // Full-text search across multiple fields
+    if (q) {
+        filter.$or = [
+            { car_make: new RegExp(q, "i") },
+            { car_model: new RegExp(q, "i") },
+            { fuel_type: new RegExp(q, "i") },
+            { transmission_type: new RegExp(q, "i") }
+        ];
+    }
+
+    // Apply individual filters
+    if (service_id) filter.service_id = service_id;
+    if (car_make) filter.car_make = new RegExp(car_make, "i");
+    if (car_model) filter.car_model = new RegExp(car_model, "i");
+    if (fuel_type) filter.fuel_type = fuel_type;
+    if (transmission_type) filter.transmission_type = transmission_type;
+
+    // Parse pagination parameters
+    const page = parseInt(_page);
+    const limit = parseInt(_limit);
+    const skip = (page - 1) * limit;
+
+    // Determine sorting
+    const sortField = _sort === "id" ? "_id" : _sort;
+    const sortOrder = _order === "asc" ? 1 : -1;
+    const sortOptions = { [sortField]: sortOrder };
+
+    // Count total matching records
+    const totalCount = await ServicePricing.countDocuments(filter);
+
+    // Fetch paginated, filtered, and sorted data
+    const servicePricing = await ServicePricing.find(filter)
+        .populate({
+            path: 'service_id',
+            select: '_id service_name'
+        })
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit);
+
+    // Set X-Total-Count header for pagination
+    res.setHeader('X-Total-Count', totalCount);
+    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');
+
     res.status(200).json(servicePricing);
 });
 
@@ -34,21 +92,6 @@ const getServicePrice = asyncHandler(async (req, res) => {
 // @desc    Create a new service pricing entry
 // @route   POST /api/service-pricing
 // @access  Private (Admin only)
-// const createServicePricing = asyncHandler(async (req, res) => {
-//     const { service_id, car_make, car_model, fuel_type, transmission_type, service_price } = req.body;
-
-//     const newPricing = new ServicePricing({
-//         service_id,
-//         car_make,
-//         car_model,
-//         fuel_type,
-//         transmission_type,
-//         service_price
-//     });
-
-//     await newPricing.save();
-//     res.status(201).json(newPricing);
-// });
 const createServicePricing = asyncHandler(async (req, res) => {
     const { service_id, car_make, car_model, fuel_type, transmission_type, service_price } = req.body;
 
@@ -83,7 +126,6 @@ const createServicePricing = asyncHandler(async (req, res) => {
     await newPricing.save();
     res.status(201).json(newPricing);
 });
-
 
 // @desc    Update service pricing entry
 // @route   PUT /api/service-pricing/:id

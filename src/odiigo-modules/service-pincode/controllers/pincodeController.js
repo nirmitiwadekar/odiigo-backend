@@ -3,7 +3,51 @@ const Pincode = require("../model/servicePincode");
 
 // Get all pincodes
 const getPincodes = asyncHandler(async (req, res) => {
-    const pincodes = await Pincode.find();
+    const { 
+        q,      // global search query
+        pincode, // specific pincode filter
+        area,    // specific area filter
+        _sort = 'pincode',   // default sort field
+        _order = 'ASC',      // default sort order
+        _start = 0,          // pagination start
+        _end = 10            // pagination end
+    } = req.query;
+
+    // Build query object
+    let query = {};
+
+    // Global search across pincode and area
+    if (q) {
+        query.$or = [
+            { pincode: { $regex: q, $options: 'i' } },
+            { area: { $regex: q, $options: 'i' } }
+        ];
+    }
+
+    // Specific filters
+    if (pincode) {
+        query.pincode = { $regex: pincode, $options: 'i' };
+    }
+
+    if (area) {
+        query.area = { $regex: area, $options: 'i' };
+    }
+
+    // Sorting
+    const sortOptions = {};
+    sortOptions[_sort] = _order === 'ASC' ? 1 : -1;
+
+    // Pagination and query
+    const totalCount = await Pincode.countDocuments(query);
+    const pincodes = await Pincode.find(query)
+        .sort(sortOptions)
+        .skip(Number(_start))
+        .limit(Number(_end) - Number(_start));
+
+    // Set headers for react-admin
+    res.set('X-Total-Count', totalCount);
+    res.set('Access-Control-Expose-Headers', 'X-Total-Count');
+
     res.status(200).json(pincodes);
 });
 
