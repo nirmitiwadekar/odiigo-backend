@@ -14,16 +14,6 @@ const OTP_EXPIRY = process.env.OTP_EXPIRY || 300; // 5 minutes
 const generateOtp = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
-// const sendOtp = async (phone, otp) => {
-//   try {
-//     await axios.get(
-//       `https://2factor.in/API/V1/${TWOFACTOR_API_KEY}/SMS/${phone}/${otp}/OTPLogin`
-//     );
-//   } catch (error) {
-//     throw new Error("Failed to send OTP");
-//   }
-// };
-
 const sendOtp = async (phone, otp) => {
   try {
     const response = await axios.get(
@@ -39,16 +29,19 @@ const sendOtp = async (phone, otp) => {
   }
 };
 
-// 📌 **Send OTP**
+// 📌 Send OTP
 router.post("/send-otp", async (req, res) => {
-  console.log("Received send-otp request for phone:", req.body.phone);
   const { phone } = req.body;
-  if (!phone)
+  console.log("Received send-otp request for phone:", phone);
+
+  if (!phone) {
     return res.status(400).json({ message: "Phone number is required" });
+  }
 
   try {
     const otp = generateOtp();
     console.log("Generated OTP:", otp);
+
     await redisClient.setEx(`otp:${phone}`, OTP_EXPIRY, otp);
     console.log("OTP stored in Redis for phone:", phone);
 
@@ -65,68 +58,17 @@ router.post("/send-otp", async (req, res) => {
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
     console.log("Error in send-otp:", error.message);
-    res
-      .status(500)
-      .json({ message: "Error sending OTP", error: error.message });
+    res.status(500).json({ message: "Error sending OTP", error: error.message });
   }
 });
-// router.post("/send-otp", async (req, res) => {
-//   const { phone } = req.body;
-//   if (!phone)
-//     return res.status(400).json({ message: "Phone number is required" });
 
-//   try {
-//     const otp = generateOtp();
-//     await redisClient.setEx(`otp:${phone}`, OTP_EXPIRY, otp); // Store OTP in Redis with expiry
-
-//     let user = await User.findOne({ phone });
-//     if (!user) {
-//       user = new User({ phone, isVerified: false });
-//       await user.save();
-//     }
-
-//     await sendOtp(phone, otp);
-
-//     res.status(200).json({ message: "OTP sent successfully" });
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ message: "Error sending OTP", error: error.message });
-//   }
-// });
-// router.post("/send-otp", async (req, res) => {
-//   let { phone } = req.body;
-//   if (!phone)
-//     return res.status(400).json({ message: "Phone number is required" });
-
-//   // Format phone to always include +91
-//   phone = phone.startsWith("+91") ? phone : `+91${phone}`;
-
-//   try {
-//     const otp = generateOtp();
-//     await redisClient.setEx(`otp:${phone}`, OTP_EXPIRY, otp); // Store OTP in Redis with expiry
-
-//     let user = await User.findOne({ phone });
-//     if (!user) {
-//       user = new User({ phone, isVerified: false });
-//       await user.save();
-//     }
-
-//     await sendOtp(phone, otp);
-
-//     res.status(200).json({ message: "OTP sent successfully" });
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ message: "Error sending OTP", error: error.message });
-//   }
-// });
-
-// 📌 **Verify OTP and Generate JWT**
+// 📌 Verify OTP and Generate JWT
 router.post("/verify-otp", async (req, res) => {
   const { phone, otp } = req.body;
-  if (!phone || !otp)
+
+  if (!phone || !otp) {
     return res.status(400).json({ message: "Phone and OTP are required" });
+  }
 
   try {
     const storedOtp = await redisClient.get(`otp:${phone}`);
@@ -135,11 +77,10 @@ router.post("/verify-otp", async (req, res) => {
     }
 
     await redisClient.del(`otp:${phone}`);
-
     await User.updateOne({ phone }, { isVerified: true });
 
-    const accessToken = generateToken({ phone }, "15s"); // Short-lived token
-    const refreshToken = generateToken({ phone }, "60s"); // Long-lived token
+    const accessToken = generateToken({ phone }, "15s");
+    const refreshToken = generateToken({ phone }, "60s");
 
     await User.updateOne(
       { phone },
@@ -148,14 +89,10 @@ router.post("/verify-otp", async (req, res) => {
         refreshToken,
         lastLogin: new Date(),
       }
-    ); //{ refreshToken }
+    );
 
-    await redisClient.setEx(`accessToken:${phone}`, 15, accessToken); // 900s = 15m
-    await redisClient.setEx(
-      `refreshToken:${phone}`,
-      60,
-      refreshToken
-    ); // 15d
+    await redisClient.setEx(`accessToken:${phone}`, 15, accessToken);
+    await redisClient.setEx(`refreshToken:${phone}`, 60, refreshToken);
 
     res.status(200).json({
       message: "OTP verified, login successful",
@@ -163,22 +100,23 @@ router.post("/verify-otp", async (req, res) => {
       refreshToken,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error verifying OTP", error: error.message });
+    res.status(500).json({ message: "Error verifying OTP", error: error.message });
   }
 });
 
-// 📌 **Refresh Token Endpoint**
+// 📌 Refresh Token Endpoint
 router.post("/refresh-token", async (req, res) => {
   const { refreshToken } = req.body;
-  if (!refreshToken)
+
+  if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token required" });
+  }
 
   try {
     const decoded = verifyToken(refreshToken);
-    if (!decoded)
+    if (!decoded) {
       return res.status(401).json({ message: "Invalid refresh token" });
+    }
 
     const user = await User.findOne({ phone: decoded.phone, refreshToken });
     if (!user) return res.status(401).json({ message: "Unauthorized" });
@@ -187,9 +125,7 @@ router.post("/refresh-token", async (req, res) => {
 
     res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error refreshing token", error: error.message });
+    res.status(500).json({ message: "Error refreshing token", error: error.message });
   }
 });
 

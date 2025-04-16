@@ -1,12 +1,63 @@
 const asyncHandler = require('express-async-handler');
 const ServicePricing = require('../model/pricing');
-const Service = require('../../categories/services/models/services')
+const Service = require('../../categories/services/models/services');
 
-// @desc    Get all service pricing records
+// @desc    Get all service pricing records with search, filter, sort, and pagination
 // @route   GET /api/service-pricing
 // @access  Public
 const getAllServicePricing = asyncHandler(async (req, res) => {
-    const servicePricing = await ServicePricing.find().populate('service_id');
+    const {
+        q,
+        service_id,
+        car_make,
+        car_model,
+        fuel_type,
+        transmission_type,
+        _sort = "createdAt",
+        _order = "desc",
+        _page = 1,
+        _limit = 10
+    } = req.query;
+
+    let filter = {};
+
+    if (q) {
+        filter.$or = [
+            { car_make: new RegExp(q, "i") },
+            { car_model: new RegExp(q, "i") },
+            { fuel_type: new RegExp(q, "i") },
+            { transmission_type: new RegExp(q, "i") }
+        ];
+    }
+
+    if (service_id) filter.service_id = service_id;
+    if (car_make) filter.car_make = new RegExp(car_make, "i");
+    if (car_model) filter.car_model = new RegExp(car_model, "i");
+    if (fuel_type) filter.fuel_type = fuel_type;
+    if (transmission_type) filter.transmission_type = transmission_type;
+
+    const page = parseInt(_page);
+    const limit = parseInt(_limit);
+    const skip = (page - 1) * limit;
+
+    const sortField = _sort === "id" ? "_id" : _sort;
+    const sortOrder = _order === "asc" ? 1 : -1;
+    const sortOptions = { [sortField]: sortOrder };
+
+    const totalCount = await ServicePricing.countDocuments(filter);
+
+    const servicePricing = await ServicePricing.find(filter)
+        .populate({
+            path: 'service_id',
+            select: '_id service_name'
+        })
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+    res.setHeader('X-Total-Count', totalCount);
+    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');
     res.status(200).json(servicePricing);
 });
 
@@ -34,31 +85,14 @@ const getServicePrice = asyncHandler(async (req, res) => {
 // @desc    Create a new service pricing entry
 // @route   POST /api/service-pricing
 // @access  Private (Admin only)
-// const createServicePricing = asyncHandler(async (req, res) => {
-//     const { service_id, car_make, car_model, fuel_type, transmission_type, service_price } = req.body;
-
-//     const newPricing = new ServicePricing({
-//         service_id,
-//         car_make,
-//         car_model,
-//         fuel_type,
-//         transmission_type,
-//         service_price
-//     });
-
-//     await newPricing.save();
-//     res.status(201).json(newPricing);
-// });
 const createServicePricing = asyncHandler(async (req, res) => {
     const { service_id, car_make, car_model, fuel_type, transmission_type, service_price } = req.body;
 
-    // Check if the referenced service_id exists
     const serviceExists = await Service.findById(service_id);
     if (!serviceExists) {
         return res.status(400).json({ message: "Invalid service_id, service not found" });
     }
 
-    // Prevent duplicate pricing for the same service, make, model, fuel, and transmission
     const existingPricing = await ServicePricing.findOne({
         service_id,
         car_make,
