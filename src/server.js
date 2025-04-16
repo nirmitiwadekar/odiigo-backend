@@ -22,6 +22,9 @@ const authMiddleware = require("./odiigo-modules/auth/middleware/authMiddleware.
 const sessionCheck = require("./odiigo-modules/auth/middleware/sessionCheck.js");
 const cartRoutes = require("./odiigo-modules/cart/routes/cartRoutes.js");
 
+const adminRoutes = require('./odiigo-modules/admin-auth/routes/adminRoutes.js');
+
+
 dotenv.config();
 connectDb();
 
@@ -62,6 +65,9 @@ app.use("/api/serviceBuddies", serviceBuddyRoutes);
 app.use("/api/car-brands", carBrandRoutes);
 app.use("/api/car-models", carModelRoutes);
 app.use("/api/cart", cartRoutes);
+app.use('/api/admin', adminRoutes);
+
+
 
 redisClient
   .connect()

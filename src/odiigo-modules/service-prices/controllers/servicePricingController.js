@@ -59,7 +59,9 @@ const getAllServicePricing = asyncHandler(async (req, res) => {
         })
         .sort(sortOptions)
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .lean();
+
 
     // Set X-Total-Count header for pagination
     res.setHeader('X-Total-Count', totalCount);
