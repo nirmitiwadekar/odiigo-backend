@@ -12,14 +12,14 @@ const transporter = nodemailer.createTransport({
 });
 
 // send mail
-const sendResetEmail = async (admin) => {
+const sendResetEmail = async (admin, resetToken) => {
     try {
 
         // generated using tabular
         const emailContent = `
             <p>You requested a password reset.</p>
             <p>Click this link to reset your password:</p>
-            <a href="http://localhost:5173/reset-password">Reset Password</a>
+            <a href="http://localhost:5173/reset-password/"${resetToken}>Reset Password</a>
             <p>This link is valid for 1 hour.</p>
             <p>If you didn't request this, please ignore this email.</p>
         `
