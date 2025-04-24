@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { PASSWORD_RESET_REQUEST_TEMPLATE } from './emailTemplate.js';
 
 // configuration
 const transporter = nodemailer.createTransport({
@@ -6,23 +7,17 @@ const transporter = nodemailer.createTransport({
     secure: true,
     port: 465,
     auth: {
-        user: process.env.MAIL_ID || "sample@gmail.com",
+        user: process.env.MAIL_ID || "odiigoindia@gmail.com",
         pass: process.env.MAIL_PASSWORD
     }
 });
 
 // send mail
-const sendResetEmail = async (admin, resetToken) => {
+const sendResetEmail = async (admin, resetUrl) => {
     try {
 
         // generated using tabular
-        const emailContent = `
-            <p>You requested a password reset.</p>
-            <p>Click this link to reset your password:</p>
-            <a href="http://localhost:5173/reset-password/"${resetToken}>Reset Password</a>
-            <p>This link is valid for 1 hour.</p>
-            <p>If you didn't request this, please ignore this email.</p>
-        `
+        const emailContent = PASSWORD_RESET_REQUEST_TEMPLATE.replace('{resetUrl}', resetUrl);
 
         const mailOptions = {
             from: process.env.MAIL_ID || "sample@gmail.com",

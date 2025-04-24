@@ -1,4 +1,4 @@
-const { sendResetEmail } = require('../../../config/email');
+const { sendResetEmail } = require('../../../config/email/email');
 const Admin = require('../models/adminModel');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -57,7 +57,9 @@ const adminForgotPassword = async (req, res) => {
     admin.resetPasswordExpires = resetTokenExpiration;
     await admin.save();
 
-    await sendResetEmail(admin.email, resetToken);
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    await sendResetEmail(admin.email, resetUrl);
     
     res.status(200).json({
       message: 'If a user with that email exists, a password reset link has been sent.'
