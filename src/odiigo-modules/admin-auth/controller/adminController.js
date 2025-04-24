@@ -2,7 +2,6 @@ const { sendResetEmail } = require('../../../config/email/email');
 const Admin = require('../models/adminModel');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
 
 const adminSignup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -16,9 +15,11 @@ const adminSignup = async (req, res) => {
 const adminLogin = async (req, res) => {
   const { email, password } = req.body;
   const admin = await Admin.findOne({ email });
+
   if (!admin) return res.status(401).json({ message: 'Invalid email or password' });
 
   const isMatch = await admin.comparePassword(password);
+
   if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
 
   const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -87,11 +88,9 @@ const adminResetPassword = async (req, res) => {
     if(!admin) {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
-
-    // hash the new password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    admin.password = hashedPassword;
+    
+    // password will be hashed in model before document saving
+    admin.password = password;
     admin.resetPasswordToken = undefined;
     admin.resetPasswordExpires = undefined;
     await admin.save();
