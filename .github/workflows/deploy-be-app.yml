@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 name: Docker CI/CD
 
 on:
@@ -73,117 +72,36 @@ jobs:
 
   deploy:
     needs: publish
+    # Run only on pushes to main or manual trigger
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to AWS
+      - name: Deploy to AWS EC2 instance
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USERNAME }}
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
+            # Navigate to the app directory
             cd /home/ubuntu/odiigo-be
-            git pull origin main
+
+            # Create or overwrite the .env file with necessary variables for docker-compose
+            # DOCKER_TARGET might not be needed if the image tag already implies the target (e.g., :latest for prod)
+            # but keeping it if docker-compose.yml uses it.
             echo "DOCKER_TARGET=prod" > .env
             echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env
             echo "DOCKER_HUB_REPO=odiigo" >> .env
+
+            # Pull the latest image built in the 'publish' job
+            # Using 'latest' tag here, which corresponds to the tag pushed in the 'publish' job
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/odiigo:latest
+
+            # Stop and remove existing containers defined in docker-compose.yml
             docker-compose down
+
+            # Start new containers with the updated image and environment variables
             docker-compose up -d
 
-=======
-name: Docker CI/CD
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
-
-env:
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  DOCKER_HUB_REPO: odiigo
-  IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/odiigo
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      
-      - name: Build Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: false
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:latest
-          target: prod
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  publish:
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-          
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_HUB_REPO }}
-          tags: |
-            type=sha,format=long
-            type=ref,event=branch
-            latest
-      
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          target: prod
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  deploy:
-    needs: publish
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to AWS
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USERNAME }}
-          key: ${{ secrets.AWS_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/odiigo-be
-            git pull origin main
-            echo "DOCKER_TARGET=prod" > .env
-            echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env
-            echo "DOCKER_HUB_REPO=odiigo" >> .env
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/odiigo:latest
-            docker-compose down
-            docker-compose up -d
-
->>>>>>> Admin-Dashboard-new
+            # Clean up unused Docker images to save disk space
+            docker image prune -af
